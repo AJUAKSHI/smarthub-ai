@@ -16,7 +16,7 @@ UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Allowed file types
-ALLOWED_EXTENSIONS = ["pdf", "docx", "txt"]
+ALLOWED_EXTENSIONS = ["pdf", "docx", "txt", "png", "jpg", "jpeg"]
 
 class QueryRequest(BaseModel):
     question: str

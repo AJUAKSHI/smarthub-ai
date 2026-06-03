@@ -4,6 +4,12 @@ from sentence_transformers import SentenceTransformer
 from docx import Document
 import os
 
+import pytesseract
+from PIL import Image
+
+# Tell pytesseract where Tesseract is installed
+pytesseract.pytesseract.tesseract_cmd = r"D:\Tesseract OCR\tesseract.exe"
+
 # Setup ChromaDB - persistent storage
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
 collection = chroma_client.get_or_create_collection(name="smarthub_docs")
@@ -33,6 +39,11 @@ def extract_text_from_txt(file_path: str) -> str:
         text = f.read()
     return text
 
+def extract_text_from_image(file_path: str) -> str:
+    """Read text from an image using OCR"""
+    image = Image.open(file_path)
+    text = pytesseract.image_to_string(image)
+    return text
 
 def get_document_text(filename: str) -> str:
     """
@@ -46,10 +57,6 @@ def get_document_text(filename: str) -> str:
 
     return "\n".join(documents)
 
-
-
-
-
 def extract_text(file_path: str, filename: str) -> str:
     """Decide which extractor to use based on file type"""
     extension = filename.split(".")[-1].lower()
@@ -60,6 +67,8 @@ def extract_text(file_path: str, filename: str) -> str:
         return extract_text_from_docx(file_path)
     elif extension == "txt":
         return extract_text_from_txt(file_path)
+    elif extension in ["png", "jpg", "jpeg"]:
+        return extract_text_from_image(file_path)
     else:
         raise ValueError(f"Unsupported file type: {extension}. Only PDF, DOCX, TXT allowed.")
 
