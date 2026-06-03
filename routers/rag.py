@@ -5,13 +5,10 @@ from services.ai_service import get_ai_response
 import os
 import shutil
 
-
 from services.ai_service import summarize_text
 from services.rag_service import get_document_text
 
-
 from services.rag_service import collection
-
 
 router = APIRouter()
 
@@ -74,11 +71,35 @@ Answer:"""
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
 
+@router.get("/rag/documents")
+def list_documents():
+    """Get all uploaded documents"""
+    try:
+        from services.rag_service import list_documents
+        files = list_documents()
+        return {
+            "documents": files,
+            "total": len(files)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-
-
+@router.delete("/rag/documents/{filename}")
+def delete_document(filename: str):
+    """Delete a specific document from ChromaDB"""
+    try:
+        from services.rag_service import delete_document
+        result = delete_document(filename)
+        return {
+            "message": f"Document deleted successfully!",
+            "filename": result["deleted"],
+            "chunks_removed": result["chunks_removed"]
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 class SummaryRequest(BaseModel):
     filename: str

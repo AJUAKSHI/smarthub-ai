@@ -106,3 +106,33 @@ def query_documents(question: str) -> str:
     
     chunks = results["documents"][0]
     return "\n\n".join(chunks)
+
+def list_documents() -> list:
+    """Get all unique filenames stored in ChromaDB"""
+    results = collection.get()
+    
+    if not results["metadatas"]:
+        return []
+    
+    # Extract unique filenames from metadata
+    filenames = list(set(
+        meta["filename"] 
+        for meta in results["metadatas"]
+        if "filename" in meta
+    ))
+    return filenames
+
+def delete_document(filename: str) -> dict:
+    """Delete all chunks belonging to a filename"""
+    results = collection.get(
+        where={"filename": filename}
+    )
+    
+    ids = results["ids"]
+    
+    if not ids:
+        raise ValueError(f"Document '{filename}' not found in database")
+    
+    collection.delete(ids=ids)
+    
+    return {"deleted": filename, "chunks_removed": len(ids)}
