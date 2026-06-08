@@ -15,8 +15,9 @@ class ChatRequest(BaseModel):
 
 @router.post("/chat")
 def chat(request: ChatRequest):
-    reply = get_ai_response(request.message, request.history)
+    result = get_ai_response(request.message, request.history)
     return {
         "you_said": request.message,
-        "reply": reply
+        "reply": result["reply"],
+        "token_usage": result["token_usage"]
     }

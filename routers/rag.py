@@ -63,11 +63,12 @@ Question: {request.question}
 
 Answer:"""
         
-        reply = get_ai_response(prompt)
+        result = get_ai_response(prompt)
         return {
             "question": request.question,
-            "answer": reply,
-            "source": "SmartHub RAG Pipeline"
+            "answer": result["reply"],
+            "source": "SmartHub RAG Pipeline",
+            "token_usage": result["token_usage"]
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -28,9 +28,18 @@ def get_ai_response(message: str, history: list = []) -> str:
         model="llama-3.3-70b-versatile",
         messages=messages
     )
-    return response.choices[0].message.content
 
+    # Extract token usage from response
+    usage = response.usage
 
+    return {
+        "reply": response.choices[0].message.content,
+        "token_usage": {
+            "prompt_tokens": usage.prompt_tokens,
+            "completion_tokens": usage.completion_tokens,
+            "total_tokens": usage.total_tokens
+        }
+    }
 
 def summarize_text(text: str) -> str:
 
@@ -42,5 +51,5 @@ def summarize_text(text: str) -> str:
 
     Summary:
     """
-
-    return get_ai_response(prompt)
+    result = get_ai_response(prompt)
+    return result["reply"]
